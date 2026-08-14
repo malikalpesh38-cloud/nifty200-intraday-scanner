@@ -1,0 +1,4 @@
+# ક્યારેય credentials commit ન થાય એ માટે
+.env
+*.pyc
+__pycache__/
