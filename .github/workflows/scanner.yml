@@ -30,7 +30,7 @@ jobs:
           python-version: "3.11"
 
       - name: Dependencies install કરો
-        run: pip install -r requirements.txt
+        run: pip install smartapi-python pyotp pandas numpy requests websocket-client logzero
 
       - name: Scanner ચલાવો
         env:
