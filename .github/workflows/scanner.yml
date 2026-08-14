@@ -1,0 +1,43 @@
+# આ ફાઈલ તમારા repo માં આ EXACT પાથ પર મૂકવાની છે:
+#   .github/workflows/scanner.yml
+#
+# (એટલે કે repo ના root માં ".github" નામનું ફોલ્ડર બનાવો, એની અંદર
+#  "workflows" ફોલ્ડર બનાવો, અને એની અંદર આ ફાઈલ "scanner.yml" નામે મૂકો)
+
+name: Nifty200 Intraday Scanner
+
+on:
+  schedule:
+    # GitHub Actions cron હંમેશા UTC ટાઈમમાં હોય છે.
+    # IST = UTC + 5:30, એટલે 09:10 AM IST = 03:40 UTC
+    # (09:15 થી થોડું વહેલું રાખ્યું છે — GitHub ના free schedule runner
+    #  ક્યારેક 5-10 મિનિટ મોડા ટ્રિગર થાય છે, એટલે બફર જરૂરી છે)
+    - cron: "40 3 * * 1-5"   # સોમ-શુક્ર (1-5), 03:40 UTC
+  workflow_dispatch: {}       # મેન્યુઅલી "Run workflow" બટનથી ટેસ્ટ કરવા માટે
+
+jobs:
+  run-scanner:
+    runs-on: ubuntu-latest
+    timeout-minutes: 350      # ~5h50m સેફ્ટી કેપ (સ્ક્રિપ્ટ પોતે 02:00 PM પર બંધ થઈ જાય છે)
+
+    steps:
+      - name: Repo checkout કરો
+        uses: actions/checkout@v4
+
+      - name: Python સેટ કરો
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Dependencies install કરો
+        run: pip install -r requirements.txt
+
+      - name: Scanner ચલાવો
+        env:
+          ANGEL_API_KEY: ${{ secrets.ANGEL_API_KEY }}
+          ANGEL_CLIENT_ID: ${{ secrets.ANGEL_CLIENT_ID }}
+          ANGEL_PASSWORD: ${{ secrets.ANGEL_PASSWORD }}
+          ANGEL_TOTP_SECRET: ${{ secrets.ANGEL_TOTP_SECRET }}
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+        run: python nifty200_scanner.py
