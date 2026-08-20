@@ -67,7 +67,7 @@ ENTRY_SCAN_INTERVAL_SEC = 60
 INTRADAY_CACHE_REFRESH_SEC = 300
 QUOTE_BATCH_CHUNK_SIZE = 50
 
-INDIA_TZ = pytz.timezone("Asia/Kolkata")
+INDIA_TZ = ZoneInfo("Asia/Kolkata")
 
 # ==========================================================================
 # STEP 2: HELPER FUNCTIONS
