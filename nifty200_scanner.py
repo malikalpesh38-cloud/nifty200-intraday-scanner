@@ -75,7 +75,10 @@ INDIA_TZ = ZoneInfo("Asia/Kolkata")
 # ==========================================================================
 # STEP 2: HELPER FUNCTIONS
 # ==========================================================================
-
+# જો સમય સવારે 09:15 પહેલાંનો હોય અથવા બપોરે 03:30 પછીનો હોય તો સીધું Exit થવું:
+if current_time_str < "09:15" or current_time_str >= "15:30":
+    send_telegram_msg("ℹ️ માર્કેટ બંધ છે. સ્કેનર બંધ થઈ રહ્યું છે.")
+    break
 def get_ist_now():
     return datetime.now(INDIA_TZ)
 
