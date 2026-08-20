@@ -13,7 +13,10 @@ import pandas as pd
 import numpy as np
 from datetime import datetime, timedelta
 from zoneinfo import ZoneInfo
-
+try:
+    from SmartApi import SmartConnect
+except ImportError:
+    from SmartApi.smartConnect import SmartConnect
 INDIA_TZ = ZoneInfo("Asia/Kolkata")
 
 # ==========================================================================
