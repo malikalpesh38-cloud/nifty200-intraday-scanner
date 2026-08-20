@@ -75,10 +75,7 @@ INDIA_TZ = ZoneInfo("Asia/Kolkata")
 # ==========================================================================
 # STEP 2: HELPER FUNCTIONS
 # ==========================================================================
-# જો સમય સવારે 09:15 પહેલાંનો હોય અથવા બપોરે 03:30 પછીનો હોય તો સીધું Exit થવું:
-if current_time_str < "09:15" or current_time_str >= "15:30":
-    send_telegram_msg("ℹ️ માર્કેટ બંધ છે. સ્કેનર બંધ થઈ રહ્યું છે.")
-    break
+
 def get_ist_now():
     return datetime.now(INDIA_TZ)
 
@@ -470,7 +467,9 @@ def run_scanner():
         try:
             now = get_ist_now()
             current_time_str = now.strftime("%H:%M")
-
+if current_time_str < "09:15" or current_time_str >= "15:30":
+    send_telegram_msg("ℹ️ *માર્કેટ બંધ છે. સ્કેનર બંધ થઈ રહ્યું છે.*")
+    break
             if now.date() != session_date:
                 send_telegram_msg("🔄 *નવો ટ્રેડિંગ દિવસ — state reset.*")
                 session_date = now.date()
@@ -489,10 +488,6 @@ def run_scanner():
             if current_time_str >= f"{MARKET_CLOSE_HOUR:02d}:{MARKET_CLOSE_MIN:02d}":
                 send_telegram_msg("🏁 *Market Close. Scanner stopping.*")
                 break
-
-            if current_time_str < ENTRY_START_TIME:
-                time.sleep(30)
-                continue
 
             if shortlist is None:
                 send_telegram_msg(f"🔍 *Building shortlist from {len(stocks)} stocks...*")
