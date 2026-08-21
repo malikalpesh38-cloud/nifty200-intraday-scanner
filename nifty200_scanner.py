@@ -467,9 +467,9 @@ def run_scanner():
         try:
             now = get_ist_now()
             current_time_str = now.strftime("%H:%M")
-if current_time_str < "09:15" or current_time_str >= "15:30":
-    send_telegram_msg("ℹ️ *માર્કેટ બંધ છે. સ્કેનર બંધ થઈ રહ્યું છે.*")
-    break
+            if current_time_str < "09:15" or current_time_str >= "15:30":
+                send_telegram_msg("ℹ️ *માર્કેટ બંધ છે. સ્કેનર બંધ થઈ રહ્યું છે.*")
+                break
             if now.date() != session_date:
                 send_telegram_msg("🔄 *નવો ટ્રેડિંગ દિવસ — state reset.*")
                 session_date = now.date()
