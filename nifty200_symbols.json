@@ -1,0 +1,822 @@
+[
+  {
+    "symbol": "ADANIENT-EQ",
+    "token": "25"
+  },
+  {
+    "symbol": "ADANIPORTS-EQ",
+    "token": "15083"
+  },
+  {
+    "symbol": "APOLLOHOSP-EQ",
+    "token": "157"
+  },
+  {
+    "symbol": "ASIANPAINT-EQ",
+    "token": "236"
+  },
+  {
+    "symbol": "AXISBANK-EQ",
+    "token": "5900"
+  },
+  {
+    "symbol": "BAJAJ-AUTO-EQ",
+    "token": "16669"
+  },
+  {
+    "symbol": "BAJFINANCE-EQ",
+    "token": "317"
+  },
+  {
+    "symbol": "BAJAJFINSV-EQ",
+    "token": "16675"
+  },
+  {
+    "symbol": "BEL-EQ",
+    "token": "383"
+  },
+  {
+    "symbol": "BHARTIARTL-EQ",
+    "token": "10604"
+  },
+  {
+    "symbol": "CIPLA-EQ",
+    "token": "694"
+  },
+  {
+    "symbol": "COALINDIA-EQ",
+    "token": "20374"
+  },
+  {
+    "symbol": "DRREDDY-EQ",
+    "token": "881"
+  },
+  {
+    "symbol": "EICHERMOT-EQ",
+    "token": "910"
+  },
+  {
+    "symbol": "ETERNAL-EQ",
+    "token": "5097"
+  },
+  {
+    "symbol": "GRASIM-EQ",
+    "token": "1232"
+  },
+  {
+    "symbol": "HCLTECH-EQ",
+    "token": "7229"
+  },
+  {
+    "symbol": "HDFCBANK-EQ",
+    "token": "1333"
+  },
+  {
+    "symbol": "HDFCLIFE-EQ",
+    "token": "467"
+  },
+  {
+    "symbol": "HINDALCO-EQ",
+    "token": "1363"
+  },
+  {
+    "symbol": "HINDUNILVR-EQ",
+    "token": "1394"
+  },
+  {
+    "symbol": "ICICIBANK-EQ",
+    "token": "4963"
+  },
+  {
+    "symbol": "INFY-EQ",
+    "token": "1594"
+  },
+  {
+    "symbol": "INDIGO-EQ",
+    "token": "11195"
+  },
+  {
+    "symbol": "JSWSTEEL-EQ",
+    "token": "11723"
+  },
+  {
+    "symbol": "JIOFIN-EQ",
+    "token": "18143"
+  },
+  {
+    "symbol": "KOTAKBANK-EQ",
+    "token": "1922"
+  },
+  {
+    "symbol": "LT-EQ",
+    "token": "11483"
+  },
+  {
+    "symbol": "M&M-EQ",
+    "token": "2031"
+  },
+  {
+    "symbol": "CUPID-EQ",
+    "token": "18520"
+  },
+  {
+    "symbol": "MAXHEALTH-EQ",
+    "token": "22377"
+  },
+  {
+    "symbol": "NTPC-EQ",
+    "token": "11630"
+  },
+  {
+    "symbol": "NESTLEIND-EQ",
+    "token": "17963"
+  },
+  {
+    "symbol": "ONGC-EQ",
+    "token": "2475"
+  },
+  {
+    "symbol": "POWERGRID-EQ",
+    "token": "14977"
+  },
+  {
+    "symbol": "RELIANCE-EQ",
+    "token": "2885"
+  },
+  {
+    "symbol": "SBILIFE-EQ",
+    "token": "21808"
+  },
+  {
+    "symbol": "SHRIRAMFIN-EQ",
+    "token": "4306"
+  },
+  {
+    "symbol": "SBIN-EQ",
+    "token": "3045"
+  },
+  {
+    "symbol": "SUNPHARMA-EQ",
+    "token": "3351"
+  },
+  {
+    "symbol": "TCS-EQ",
+    "token": "11536"
+  },
+  {
+    "symbol": "TATACONSUM-EQ",
+    "token": "3432"
+  },
+  {
+    "symbol": "TMPV-EQ",
+    "token": "3456"
+  },
+  {
+    "symbol": "TATASTEEL-EQ",
+    "token": "3499"
+  },
+  {
+    "symbol": "TECHM-EQ",
+    "token": "13538"
+  },
+  {
+    "symbol": "TITAN-EQ",
+    "token": "3506"
+  },
+  {
+    "symbol": "TRENT-EQ",
+    "token": "1964"
+  },
+  {
+    "symbol": "ULTRACEMCO-EQ",
+    "token": "11532"
+  },
+  {
+    "symbol": "WIPRO-EQ",
+    "token": "3787"
+  },
+  {
+    "symbol": "ABB-EQ",
+    "token": "13"
+  },
+  {
+    "symbol": "ADANIENSOL-EQ",
+    "token": "10217"
+  },
+  {
+    "symbol": "ADANIGREEN-EQ",
+    "token": "3563"
+  },
+  {
+    "symbol": "ADANIPOWER-EQ",
+    "token": "17388"
+  },
+  {
+    "symbol": "AMBUJACEM-EQ",
+    "token": "1270"
+  },
+  {
+    "symbol": "DMART-EQ",
+    "token": "19913"
+  },
+  {
+    "symbol": "BAJAJHLDNG-EQ",
+    "token": "305"
+  },
+  {
+    "symbol": "BANKBARODA-EQ",
+    "token": "4668"
+  },
+  {
+    "symbol": "BPCL-EQ",
+    "token": "526"
+  },
+  {
+    "symbol": "BOSCHLTD-EQ",
+    "token": "2181"
+  },
+  {
+    "symbol": "BRITANNIA-EQ",
+    "token": "547"
+  },
+  {
+    "symbol": "CGPOWER-EQ",
+    "token": "760"
+  },
+  {
+    "symbol": "CANBK-EQ",
+    "token": "10794"
+  },
+  {
+    "symbol": "CHOLAFIN-EQ",
+    "token": "685"
+  },
+  {
+    "symbol": "CUMMINSIND-EQ",
+    "token": "1901"
+  },
+  {
+    "symbol": "DLF-EQ",
+    "token": "14732"
+  },
+  {
+    "symbol": "DIVISLAB-EQ",
+    "token": "10940"
+  },
+  {
+    "symbol": "GAIL-EQ",
+    "token": "4717"
+  },
+  {
+    "symbol": "GODREJCP-EQ",
+    "token": "10099"
+  },
+  {
+    "symbol": "HDFCAMC-EQ",
+    "token": "4244"
+  },
+  {
+    "symbol": "HAL-EQ",
+    "token": "2303"
+  },
+  {
+    "symbol": "HINDZINC-EQ",
+    "token": "1424"
+  },
+  {
+    "symbol": "HYUNDAI-EQ",
+    "token": "25844"
+  },
+  {
+    "symbol": "INDHOTEL-EQ",
+    "token": "1512"
+  },
+  {
+    "symbol": "IOC-EQ",
+    "token": "1624"
+  },
+  {
+    "symbol": "IRFC-EQ",
+    "token": "2029"
+  },
+  {
+    "symbol": "JINDALSTEL-EQ",
+    "token": "6733"
+  },
+  {
+    "symbol": "LODHA-EQ",
+    "token": "3220"
+  },
+  {
+    "symbol": "MAZDOCK-EQ",
+    "token": "509"
+  },
+  {
+    "symbol": "MUTHOOTFIN-EQ",
+    "token": "23650"
+  },
+  {
+    "symbol": "PIDILITIND-EQ",
+    "token": "2664"
+  },
+  {
+    "symbol": "PFC-EQ",
+    "token": "14299"
+  },
+  {
+    "symbol": "PNB-EQ",
+    "token": "10666"
+  },
+  {
+    "symbol": "RECLTD-EQ",
+    "token": "15355"
+  },
+  {
+    "symbol": "MOTHERSON-EQ",
+    "token": "4204"
+  },
+  {
+    "symbol": "UTKARSHBNK-EQ",
+    "token": "17358"
+  },
+  {
+    "symbol": "ENRIN-EQ",
+    "token": "756871"
+  },
+  {
+    "symbol": "SIEMENS-EQ",
+    "token": "3150"
+  },
+  {
+    "symbol": "SOLARINDS-EQ",
+    "token": "13332"
+  },
+  {
+    "symbol": "TVSMOTOR-EQ",
+    "token": "8479"
+  },
+  {
+    "symbol": "TATACAP-EQ",
+    "token": "759265"
+  },
+  {
+    "symbol": "TMCV-EQ",
+    "token": "759782"
+  },
+  {
+    "symbol": "TATAPOWER-EQ",
+    "token": "3426"
+  },
+  {
+    "symbol": "TORNTPHARM-EQ",
+    "token": "3518"
+  },
+  {
+    "symbol": "UNIONBANK-EQ",
+    "token": "10753"
+  },
+  {
+    "symbol": "UNITDSPR-EQ",
+    "token": "10447"
+  },
+  {
+    "symbol": "VBL-EQ",
+    "token": "18921"
+  },
+  {
+    "symbol": "VEDL-EQ",
+    "token": "3063"
+  },
+  {
+    "symbol": "ZYDUSLIFE-EQ",
+    "token": "7929"
+  },
+  {
+    "symbol": "360ONE-EQ",
+    "token": "13061"
+  },
+  {
+    "symbol": "APLAPOLLO-EQ",
+    "token": "25780"
+  },
+  {
+    "symbol": "AUBANK-EQ",
+    "token": "21238"
+  },
+  {
+    "symbol": "ATGL-EQ",
+    "token": "6066"
+  },
+  {
+    "symbol": "ABCAPITAL-EQ",
+    "token": "21614"
+  },
+  {
+    "symbol": "ALKEM-EQ",
+    "token": "11703"
+  },
+  {
+    "symbol": "ASHOKLEY-EQ",
+    "token": "212"
+  },
+  {
+    "symbol": "ASTRAL-EQ",
+    "token": "14418"
+  },
+  {
+    "symbol": "AUROPHARMA-EQ",
+    "token": "275"
+  },
+  {
+    "symbol": "BSE-EQ",
+    "token": "19585"
+  },
+  {
+    "symbol": "BANKINDIA-EQ",
+    "token": "4745"
+  },
+  {
+    "symbol": "BDL-EQ",
+    "token": "2144"
+  },
+  {
+    "symbol": "BHARATFORG-EQ",
+    "token": "422"
+  },
+  {
+    "symbol": "BHEL-EQ",
+    "token": "438"
+  },
+  {
+    "symbol": "GROWW-EQ",
+    "token": "759806"
+  },
+  {
+    "symbol": "BIOCON-EQ",
+    "token": "11373"
+  },
+  {
+    "symbol": "BLUESTARCO-EQ",
+    "token": "8311"
+  },
+  {
+    "symbol": "COCHINSHIP-EQ",
+    "token": "21508"
+  },
+  {
+    "symbol": "COFORGE-EQ",
+    "token": "11543"
+  },
+  {
+    "symbol": "COLPAL-EQ",
+    "token": "15141"
+  },
+  {
+    "symbol": "CONCOR-EQ",
+    "token": "4749"
+  },
+  {
+    "symbol": "COROMANDEL-EQ",
+    "token": "739"
+  },
+  {
+    "symbol": "DABUR-EQ",
+    "token": "772"
+  },
+  {
+    "symbol": "DIXON-EQ",
+    "token": "21690"
+  },
+  {
+    "symbol": "EXIDEIND-EQ",
+    "token": "676"
+  },
+  {
+    "symbol": "NYKAA-EQ",
+    "token": "6545"
+  },
+  {
+    "symbol": "FEDERALBNK-EQ",
+    "token": "1023"
+  },
+  {
+    "symbol": "FORTIS-EQ",
+    "token": "14592"
+  },
+  {
+    "symbol": "GVT&D-EQ",
+    "token": "16783"
+  },
+  {
+    "symbol": "GMRAIRPORT-EQ",
+    "token": "13528"
+  },
+  {
+    "symbol": "GLENMARK-EQ",
+    "token": "7406"
+  },
+  {
+    "symbol": "GODFRYPHLP-EQ",
+    "token": "1181"
+  },
+  {
+    "symbol": "GODREJPROP-EQ",
+    "token": "17875"
+  },
+  {
+    "symbol": "HAVELLS-EQ",
+    "token": "9819"
+  },
+  {
+    "symbol": "HEROMOTOCO-EQ",
+    "token": "1348"
+  },
+  {
+    "symbol": "HINDPETRO-EQ",
+    "token": "1406"
+  },
+  {
+    "symbol": "POWERINDIA-EQ",
+    "token": "18457"
+  },
+  {
+    "symbol": "HUDCO-EQ",
+    "token": "20825"
+  },
+  {
+    "symbol": "ICICIGI-EQ",
+    "token": "21770"
+  },
+  {
+    "symbol": "ICICIAMC-EQ",
+    "token": "760407"
+  },
+  {
+    "symbol": "IDFCFIRSTB-EQ",
+    "token": "11184"
+  },
+  {
+    "symbol": "ITC-EQ",
+    "token": "1660"
+  },
+  {
+    "symbol": "INDIANB-EQ",
+    "token": "14309"
+  },
+  {
+    "symbol": "IRCTC-EQ",
+    "token": "13611"
+  },
+  {
+    "symbol": "IREDA-EQ",
+    "token": "20261"
+  },
+  {
+    "symbol": "INDUSTOWER-EQ",
+    "token": "29135"
+  },
+  {
+    "symbol": "INDUSINDBK-EQ",
+    "token": "5258"
+  },
+  {
+    "symbol": "NAUKRI-EQ",
+    "token": "13751"
+  },
+  {
+    "symbol": "JSWENERGY-EQ",
+    "token": "17869"
+  },
+  {
+    "symbol": "JUBLFOOD-EQ",
+    "token": "18096"
+  },
+  {
+    "symbol": "KEI-EQ",
+    "token": "13310"
+  },
+  {
+    "symbol": "KPITTECH-EQ",
+    "token": "9683"
+  },
+  {
+    "symbol": "KALYANKJIL-EQ",
+    "token": "2955"
+  },
+  {
+    "symbol": "LTF-EQ",
+    "token": "24948"
+  },
+  {
+    "symbol": "LGEINDIA-EQ",
+    "token": "760213"
+  },
+  {
+    "symbol": "LICHSGFIN-EQ",
+    "token": "1997"
+  },
+  {
+    "symbol": "LAURUSLABS-EQ",
+    "token": "19234"
+  },
+  {
+    "symbol": "LENSKART-EQ",
+    "token": "759605"
+  },
+  {
+    "symbol": "LUPIN-EQ",
+    "token": "10440"
+  },
+  {
+    "symbol": "MRF-EQ",
+    "token": "2277"
+  },
+  {
+    "symbol": "M&MFIN-EQ",
+    "token": "13285"
+  },
+  {
+    "symbol": "MANKIND-EQ",
+    "token": "15380"
+  },
+  {
+    "symbol": "MARICO-EQ",
+    "token": "4067"
+  },
+  {
+    "symbol": "MFSL-EQ",
+    "token": "2142"
+  },
+  {
+    "symbol": "MOTILALOFS-EQ",
+    "token": "14947"
+  },
+  {
+    "symbol": "MPHASIS-EQ",
+    "token": "4503"
+  },
+  {
+    "symbol": "NTPCGREEN-EQ",
+    "token": "27176"
+  },
+  {
+    "symbol": "NHPC-EQ",
+    "token": "17400"
+  },
+  {
+    "symbol": "NMDC-EQ",
+    "token": "15332"
+  },
+  {
+    "symbol": "NATIONALUM-EQ",
+    "token": "6364"
+  },
+  {
+    "symbol": "OBEROIRLTY-EQ",
+    "token": "20242"
+  },
+  {
+    "symbol": "OIL-EQ",
+    "token": "17438"
+  },
+  {
+    "symbol": "PAYTM-EQ",
+    "token": "6705"
+  },
+  {
+    "symbol": "OFSS-EQ",
+    "token": "10738"
+  },
+  {
+    "symbol": "POLICYBZR-EQ",
+    "token": "6656"
+  },
+  {
+    "symbol": "PIIND-EQ",
+    "token": "24184"
+  },
+  {
+    "symbol": "PAGEIND-EQ",
+    "token": "14413"
+  },
+  {
+    "symbol": "PATANJALI-EQ",
+    "token": "17029"
+  },
+  {
+    "symbol": "PERSISTENT-EQ",
+    "token": "18365"
+  },
+  {
+    "symbol": "PHOENIXLTD-EQ",
+    "token": "14552"
+  },
+  {
+    "symbol": "POLYCAB-EQ",
+    "token": "9590"
+  },
+  {
+    "symbol": "PREMIERENE-EQ",
+    "token": "25049"
+  },
+  {
+    "symbol": "PRESTIGE-EQ",
+    "token": "20302"
+  },
+  {
+    "symbol": "RADICO-EQ",
+    "token": "10990"
+  },
+  {
+    "symbol": "RVNL-EQ",
+    "token": "9552"
+  },
+  {
+    "symbol": "SBICARD-EQ",
+    "token": "17971"
+  },
+  {
+    "symbol": "SRF-EQ",
+    "token": "3273"
+  },
+  {
+    "symbol": "SAIL-EQ",
+    "token": "2963"
+  },
+  {
+    "symbol": "SUPREMEIND-EQ",
+    "token": "3363"
+  },
+  {
+    "symbol": "SUZLON-EQ",
+    "token": "12018"
+  },
+  {
+    "symbol": "SWIGGY-EQ",
+    "token": "27066"
+  },
+  {
+    "symbol": "TATACOMM-EQ",
+    "token": "3721"
+  },
+  {
+    "symbol": "TATAELXSI-EQ",
+    "token": "3411"
+  },
+  {
+    "symbol": "TATAINVEST-EQ",
+    "token": "1621"
+  },
+  {
+    "symbol": "TIINDIA-EQ",
+    "token": "312"
+  },
+  {
+    "symbol": "UPL-EQ",
+    "token": "11287"
+  },
+  {
+    "symbol": "VMM-EQ",
+    "token": "27969"
+  },
+  {
+    "symbol": "LEMONTREE-EQ",
+    "token": "2606"
+  },
+  {
+    "symbol": "VOLTAS-EQ",
+    "token": "3718"
+  },
+  {
+    "symbol": "WAAREEENER-EQ",
+    "token": "25907"
+  },
+  {
+    "symbol": "YESBANK-EQ",
+    "token": "11915"
+  },
+  {
+    "symbol": "FIVESTAR-EQ",
+    "token": "12032"
+  },
+  {
+    "symbol": "CROMPTON-EQ",
+    "token": "17094"
+  },
+  {
+    "symbol": "SAPPHIRE-EQ",
+    "token": "6718"
+  },
+  {
+    "symbol": "BIKAJI-EQ",
+    "token": "11966"
+  },
+  {
+    "symbol": "DOMS-EQ",
+    "token": "20551"
+  },
+  {
+    "symbol": "NIACL-EQ",
+    "token": "399"
+  }
+]
