@@ -3,9 +3,7 @@
 #
 # (એટલે કે repo ના root માં ".github" નામનું ફોલ્ડર બનાવો, એની અંદર
 #  "workflows" ફોલ્ડર બનાવો, અને એની અંદર આ ફાઈલ "scanner.yml" નામે મૂકો)
-
 name: Nifty200 Intraday Scanner
-
 on:
   schedule:
     # GitHub Actions cron હંમેશા UTC ટાઈમમાં હોય છે.
@@ -14,24 +12,23 @@ on:
     #  ક્યારેક 5-10 મિનિટ મોડા ટ્રિગર થાય છે, એટલે બફર જરૂરી છે)
     - cron: "40 3 * * 1-5"   # સોમ-શુક્ર (1-5), 03:40 UTC
   workflow_dispatch: {}       # મેન્યુઅલી "Run workflow" બટનથી ટેસ્ટ કરવા માટે
-
 jobs:
   run-scanner:
     runs-on: ubuntu-latest
-    timeout-minutes: 350      # ~5h50m સેફ્ટી કેપ (સ્ક્રિપ્ટ પોતે 02:00 PM પર બંધ થઈ જાય છે)
-
+    # FIX: સ્ક્રિપ્ટ ખરેખર 15:30 IST સુધી ચાલે છે (market close), 14:00 એ
+    # ફક્ત નવા entry બંધ થાય છે — આખી સ્ક્રિપ્ટ નહીં. 09:10 IST start થી
+    # 15:30 IST સુધી ~6h20m થાય છે, + setup overhead. એટલે 350 ને બદલે
+    # 400 મિનિટ રાખ્યું છે, જેથી GitHub સ્ક્રિપ્ટને વચ્ચે force-kill ન કરે.
+    timeout-minutes: 400
     steps:
       - name: Repo checkout કરો
         uses: actions/checkout@v4
-
       - name: Python સેટ કરો
         uses: actions/setup-python@v5
         with:
           python-version: "3.11"
-
       - name: Dependencies install કરો
         run: pip install smartapi-python pyotp pandas numpy requests websocket-client logzero
-
       - name: Scanner ચલાવો
         env:
           ANGEL_API_KEY: ${{ secrets.ANGEL_API_KEY }}
