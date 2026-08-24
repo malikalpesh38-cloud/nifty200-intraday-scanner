@@ -12,6 +12,12 @@ on:
     #  ક્યારેક 5-10 મિનિટ મોડા ટ્રિગર થાય છે, એટલે બફર જરૂરી છે)
     - cron: "40 3 * * 1-5"   # સોમ-શુક્ર (1-5), 03:40 UTC
   workflow_dispatch: {}       # મેન્યુઅલી "Run workflow" બટનથી ટેસ્ટ કરવા માટે
+
+# ડુપ્લિકેટ રન રોકવા માટે Concurrency Lock
+concurrency:
+  group: nifty-scanner-single-run
+  cancel-in-progress: false
+
 jobs:
   run-scanner:
     runs-on: ubuntu-latest
