@@ -331,42 +331,142 @@ def calc_volatility_contraction(df: pd.DataFrame):
 
 
 def deep_filters_pass(df, df_today, prev_close, quote, now, avg_vol_10d, sector_positive):
+    """
+    FIX (diagnostics): હવે આ function ત્રીજું value પણ return કરે છે —
+    `metrics` dict — જેમાં LTP/RSI/VWAP/VCP/Gap/Volume/Buyer% ના actual
+    computed values હોય છે, ભલે condition pass થાય કે fail. આનાથી
+    caller ને diagnostic message અને EOD summary બંને માટે data મળે છે.
+    Pass/Fail logic બિલકુલ same રાખ્યું છે, ફક્ત values ને capture કરી છે.
+    """
     ltp = df_today["close"].iloc[-1]
+    metrics = {"ltp": round(float(ltp), 2)}
 
     if is_in_circuit(quote):
-        return False, "Stock in upper/lower circuit"
-    if quote and quote.get("buyer_pct") is not None and quote["buyer_pct"] < MIN_BUYER_SIDE_PCT:
-        return False, f"Buyer side only {quote['buyer_pct']:.1f}%"
+        return False, "Stock in upper/lower circuit", metrics
+
+    buyer_pct = quote.get("buyer_pct") if quote else None
+    metrics["buyer_pct"] = round(buyer_pct, 1) if buyer_pct is not None else None
+    if buyer_pct is not None and buyer_pct < MIN_BUYER_SIDE_PCT:
+        return False, f"Buyer side only {buyer_pct:.1f}%", metrics
 
     # Gap filter (simple %, ATR હટાવ્યું)
     gap_pct = abs((df_today["open"].iloc[0] - prev_close) / prev_close) * 100
+    metrics["gap_pct"] = round(float(gap_pct), 2)
     if gap_pct > GAP_FILTER_PCT:
-        return False, "Gap too large"
+        return False, f"Gap too large ({metrics['gap_pct']}%)", metrics
 
     # RSI (50-80)
     rsi = calc_rsi(df["close"]).iloc[-1]
+    metrics["rsi"] = round(float(rsi), 2) if pd.notna(rsi) else None
     if pd.isna(rsi) or not (RSI_LOW <= rsi <= RSI_HIGH):
-        return False, "RSI out of range"
+        return False, f"RSI out of range ({metrics['rsi']})", metrics
 
     # Volume (raw actual, vs 10-Day Avg)
     vol_mult = get_raw_volume_multiplier(df_today, avg_vol_10d)
+    metrics["vol_mult"] = round(float(vol_mult), 2)
     if vol_mult < get_volume_threshold(now):
-        return False, f"Volume too low ({vol_mult:.2f}x)"
+        return False, f"Volume too low ({vol_mult:.2f}x)", metrics
 
     # VWAP
     vwap = calc_vwap(df_today).iloc[-1]
+    metrics["vwap"] = round(float(vwap), 2)
     if ltp <= vwap:
-        return False, "LTP below VWAP"
+        return False, f"LTP below VWAP (LTP {ltp:.2f} <= VWAP {vwap:.2f})", metrics
 
     # VCP
     vcf = calc_volatility_contraction(df)
+    metrics["vcp"] = round(float(vcf), 3) if (vcf is not None and vcf != 999) else vcf
     if vcf is None or vcf >= MAX_VCP:
-        return False, "VCP too high / not contracting"
+        return False, f"VCP too high / not contracting ({metrics['vcp']})", metrics
 
     # Sector — SOFT check only (block નથી કરતું, contradiction resolve — નીચે chat note જુઓ)
     # sector_positive param અહીં ફક્ત message-tagging માટે વપરાય છે, caller માં.
 
-    return True, "OK"
+    return True, "OK", metrics
+
+
+def format_diag_message(symbol: str, metrics: dict):
+    """
+    NEW: સ્ટોક પહેલીવાર entry-scan filter-check માંથી પસાર થાય ત્યારે (pass
+    થાય કે fail — બંને case માં) એક વખત આ diagnostic message મોકલાય છે,
+    જેમાં LTP/RSI/VWAP/VCP/Gap/Buyer% ના actual values + કઈ condition
+    ✅ satisfy થાય છે અને કઈ ❌ નથી થતી એ દેખાય છે.
+    """
+    def flag(ok):
+        return "✅" if ok else ("❌" if ok is False else "➖")
+
+    ltp = metrics.get("ltp")
+    rsi = metrics.get("rsi")
+    vwap = metrics.get("vwap")
+    vcp = metrics.get("vcp")
+    gap = metrics.get("gap_pct")
+    vol_mult = metrics.get("vol_mult")
+    buyer = metrics.get("buyer_pct")
+
+    rsi_ok = (RSI_LOW <= rsi <= RSI_HIGH) if rsi is not None else None
+    vwap_ok = (ltp is not None and vwap is not None and ltp > vwap) if vwap is not None else None
+    vcp_ok = (vcp is not None and vcp != 999 and vcp < MAX_VCP) if vcp is not None else None
+    gap_ok = (gap <= GAP_FILTER_PCT) if gap is not None else None
+    vol_ok = (vol_mult is not None) if vol_mult is None else None  # threshold time-dependent, info only
+    buyer_ok = (buyer >= MIN_BUYER_SIDE_PCT) if buyer is not None else None
+
+    lines = [f"🆕 *Shortlist Check:* {symbol}", "", f"💰 LTP: ₹{ltp}"]
+    lines.append(f"{flag(rsi_ok)} RSI: {rsi} (જોઈએ {RSI_LOW}-{RSI_HIGH})")
+    lines.append(f"{flag(vwap_ok)} VWAP: ₹{vwap} (LTP {'>' if vwap_ok else '<='} VWAP જોઈએ)")
+    lines.append(f"{flag(vcp_ok)} VCP: {vcp} (જોઈએ < {MAX_VCP})")
+    lines.append(f"{flag(gap_ok)} Gap: {gap}% (જોઈએ <= {GAP_FILTER_PCT}%)")
+    if buyer is not None:
+        lines.append(f"{flag(buyer_ok)} Buyer side: {buyer}% (જોઈએ >= {MIN_BUYER_SIDE_PCT}%)")
+    if vol_mult is not None:
+        lines.append(f"➖ Volume: {vol_mult}x avg (time-based threshold)")
+    lines.append("")
+    lines.append("ℹ️ *આ ફક્ત diagnostic info છે.* Actual BUY signal બધી condition પાસ થાય ત્યારે જ અલગથી મોકલાશે.")
+    return "\n".join(lines)
+
+
+def format_eod_rejection_summary(shortlist, rejection_reasons: dict, active_trades):
+    """
+    NEW: EOD_ALERT_TIME (3:00 PM) આસપાસ એક વખત મોકલાય છે — આજે shortlist
+    થયેલા સ્ટોકમાંથી કેટલા entry લેવાયા, કેટલા reject થયા અને કયા કારણથી
+    (reason પ્રમાણે group કરીને), અને કેટલા સ્ટોકનું filter-check જ ના
+    થયું (દા.ત. Nifty આખો દિવસ negative રહ્યું હોય તો).
+    """
+    active_symbols = {t["symbol"] for t in active_trades}
+    total = len(shortlist)
+    entered = len(active_symbols)
+
+    rejected = {
+        s["symbol"]: rejection_reasons.get(s["symbol"])
+        for s in shortlist
+        if s["symbol"] not in active_symbols and s["symbol"] in rejection_reasons
+    }
+    not_evaluated = [
+        s["symbol"] for s in shortlist
+        if s["symbol"] not in active_symbols and s["symbol"] not in rejection_reasons
+    ]
+
+    by_reason = {}
+    for sym, reason in rejected.items():
+        key = (reason or "Unknown").split(" (")[0]   # similar reasons group કરવા માટે prefix વાપર્યો
+        by_reason.setdefault(key, []).append(sym)
+
+    lines = [
+        "📊 *End-of-Day Shortlist Summary*",
+        "",
+        f"કુલ Shortlisted: {total}",
+        f"✅ Entry લેવાયું: {entered}",
+        f"❌ Reject થયા: {len(rejected)}",
+    ]
+    if not_evaluated:
+        lines.append(f"⏳ ક્યારેય filter-check જ ના થયું: {len(not_evaluated)} ({', '.join(not_evaluated)})")
+
+    if by_reason:
+        lines.append("")
+        lines.append("*Reject Reasons:*")
+        for reason, syms in sorted(by_reason.items(), key=lambda x: -len(x[1])):
+            lines.append(f"• {reason} — {len(syms)} સ્ટોક: {', '.join(syms)}")
+
+    return "\n".join(lines)
 
 
 def build_daily_shortlist(smart_api, stocks, stock_sector_map):
@@ -461,6 +561,11 @@ def run_scanner():
     intraday_cache = {}
     last_entry_scan_at = None
 
+    # NEW: diagnostics/rejection tracking (દરરોજ reset થાય છે)
+    rejection_reasons = {}   # symbol -> latest reject reason (આજનું)
+    diag_sent = set()        # જે સ્ટોકનો diagnostic message આજે એકવાર મોકલાઈ ગયો
+    eod_summary_sent = False
+
     send_telegram_msg("🚀 *Nifty 200 Intraday Scanner Started!*")
 
     while True:
@@ -478,6 +583,9 @@ def run_scanner():
                 consecutive_errors = 0
                 intraday_cache = {}
                 last_entry_scan_at = None
+                rejection_reasons = {}
+                diag_sent = set()
+                eod_summary_sent = False
 
             if (now - last_heartbeat).total_seconds() >= 1800:
                 send_telegram_msg(f"🟢 *System OK* | {current_time_str} IST")
@@ -493,6 +601,11 @@ def run_scanner():
                 send_telegram_msg(f"🔍 *Building shortlist from {len(stocks)} stocks...*")
                 shortlist = build_daily_shortlist(smart_api, stocks, stock_sector_map)
                 send_telegram_msg(f"✅ *Shortlist ready:* {len(shortlist)} stocks (score {MIN_SCORE}+/{MAX_POSSIBLE_SCORE}).")
+
+            # NEW: EOD Rejection Summary — 3:00 PM પછી, દિવસમાં એક જ વાર
+            if shortlist is not None and current_time_str >= EOD_ALERT_TIME and not eod_summary_sent:
+                send_telegram_msg(format_eod_rejection_summary(shortlist, rejection_reasons, active_trades))
+                eod_summary_sent = True
 
             # ---- STEP A: Monitor Active Trades (every tick, batched) ----
             if active_trades:
@@ -534,10 +647,19 @@ def run_scanner():
                             if sector_token else True
 
                         quote = quotes.get(token)
-                        ok, _ = deep_filters_pass(df, df_today, prev_close, quote, now,
-                                                   avg_vol_10d, sector_positive)
+                        ok, reason, metrics = deep_filters_pass(df, df_today, prev_close, quote, now,
+                                                                 avg_vol_10d, sector_positive)
+
+                        # NEW: સ્ટોક પહેલીવાર ચેક થાય ત્યારે diagnostic message (એક જ વાર/દિવસ)
+                        if symbol not in diag_sent:
+                            diag_sent.add(symbol)
+                            send_telegram_msg(format_diag_message(symbol, metrics))
+
                         if not ok:
+                            rejection_reasons[symbol] = reason   # NEW: reject reason log (latest)
                             continue
+
+                        rejection_reasons.pop(symbol, None)      # entry લેવાય તો reject log માંથી કાઢી નાખો
 
                         ltp = quote["ltp"] if quote and quote.get("ltp") else df_today["close"].iloc[-1]
                         sl = round(ltp * (1 - INITIAL_SL_PCT / 100), 2)
