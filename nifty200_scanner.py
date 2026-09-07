@@ -385,12 +385,16 @@ def deep_filters_pass(df, df_today, prev_close, quote, now, avg_vol_10d, sector_
     return True, "OK", metrics
 
 
-def format_diag_message(symbol: str, metrics: dict):
+def format_diag_message(symbol: str, score: int, metrics: dict,
+                         nifty_ok: bool = None, sector_positive: bool = None,
+                         has_event: bool = False):
     """
-    NEW: સ્ટોક પહેલીવાર entry-scan filter-check માંથી પસાર થાય ત્યારે (pass
-    થાય કે fail — બંને case માં) એક વખત આ diagnostic message મોકલાય છે,
-    જેમાં LTP/RSI/VWAP/VCP/Gap/Buyer% ના actual values + કઈ condition
-    ✅ satisfy થાય છે અને કઈ ❌ નથી થતી એ દેખાય છે.
+    FIX (તમારી feedback પ્રમાણે): આ message હવે Nifty/Sector negative હોય કે
+    VWAP/Buyer-side fail થાય તો પણ — score 80+ ધરાવતા દરેક શોર્ટલિસ્ટેડ
+    સ્ટોક માટે એક જ વાર મોકલાય છે (caller side માંથી nifty_ok ગેટ કાઢી
+    નાખ્યો છે). VCP/RSI/Volume/LTP ના actual values હંમેશા દેખાય છે.
+    Market/Sector Trend ને ફક્ત info તરીકે ઉમેર્યા છે, જેથી ખબર પડે કે
+    સ્ટોકની condition ok હોવા છતાં entry કેમ ના આવ્યું.
     """
     def flag(ok):
         return "✅" if ok else ("❌" if ok is False else "➖")
@@ -407,20 +411,26 @@ def format_diag_message(symbol: str, metrics: dict):
     vwap_ok = (ltp is not None and vwap is not None and ltp > vwap) if vwap is not None else None
     vcp_ok = (vcp is not None and vcp != 999 and vcp < MAX_VCP) if vcp is not None else None
     gap_ok = (gap <= GAP_FILTER_PCT) if gap is not None else None
-    vol_ok = (vol_mult is not None) if vol_mult is None else None  # threshold time-dependent, info only
     buyer_ok = (buyer >= MIN_BUYER_SIDE_PCT) if buyer is not None else None
 
-    lines = [f"🆕 *Shortlist Check:* {symbol}", "", f"💰 LTP: ₹{ltp}"]
-    lines.append(f"{flag(rsi_ok)} RSI: {rsi} (જોઈએ {RSI_LOW}-{RSI_HIGH})")
-    lines.append(f"{flag(vwap_ok)} VWAP: ₹{vwap} (LTP {'>' if vwap_ok else '<='} VWAP જોઈએ)")
+    lines = [f"🆕 *Shortlist Stock:* {symbol}  (Score: {score}/{MAX_POSSIBLE_SCORE})", "", f"💰 LTP: ₹{ltp}"]
     lines.append(f"{flag(vcp_ok)} VCP: {vcp} (જોઈએ < {MAX_VCP})")
-    lines.append(f"{flag(gap_ok)} Gap: {gap}% (જોઈએ <= {GAP_FILTER_PCT}%)")
-    if buyer is not None:
-        lines.append(f"{flag(buyer_ok)} Buyer side: {buyer}% (જોઈએ >= {MIN_BUYER_SIDE_PCT}%)")
+    lines.append(f"{flag(rsi_ok)} RSI: {rsi} (જોઈએ {RSI_LOW}-{RSI_HIGH})")
     if vol_mult is not None:
         lines.append(f"➖ Volume: {vol_mult}x avg (time-based threshold)")
+    lines.append(f"{flag(gap_ok)} Gap: {gap}% (જોઈએ <= {GAP_FILTER_PCT}%)")
+    lines.append(f"{flag(vwap_ok)} VWAP: ₹{vwap} (LTP {'>' if vwap_ok else '<='} VWAP)")
+    if buyer is not None:
+        lines.append(f"{flag(buyer_ok)} Buyer side: {buyer}% (જોઈએ >= {MIN_BUYER_SIDE_PCT}%)")
+
     lines.append("")
-    lines.append("ℹ️ *આ ફક્ત diagnostic info છે.* Actual BUY signal બધી condition પાસ થાય ત્યારે જ અલગથી મોકલાશે.")
+    lines.append(f"{flag(nifty_ok)} Market (Nifty) Trend: {'Positive' if nifty_ok else 'Negative'}")
+    lines.append(f"{flag(sector_positive)} Sector Trend: {'Positive' if sector_positive else 'Negative'}")
+    if has_event:
+        lines.append("⚠️ આજે આ સ્ટોકમાં Corporate Event (Result/Dividend) છે.")
+
+    lines.append("")
+    lines.append("ℹ️ *આ ફક્ત diagnostic info છે.* Actual BUY signal બધી condition (Market Trend સહિત) પાસ થાય ત્યારે જ અલગથી મોકલાશે.")
     return "\n".join(lines)
 
 
@@ -620,77 +630,96 @@ def run_scanner():
             if allow_new_entry and due_for_scan:
                 last_entry_scan_at = now
                 nifty_ok = is_index_positive(smart_api, NIFTY_TOKEN, intraday_cache, now)
-                if nifty_ok:
-                    active_symbols = {t["symbol"] for t in active_trades}
-                    candidates = [s for s in shortlist if s["symbol"] not in active_symbols]
-                    cand_tokens = [c["token"] for c in candidates]
-                    quotes = get_market_quotes_batch(smart_api, cand_tokens)
 
-                    # FIX #1: multiple trades allowed હોવાથી, જે પણ સ્ટોક
-                    # filters pass કરે એ DEરેકને signal મોકલવો — ફક્ત
-                    # single top-score ને નહીં (પહેલાં આ bug હતું).
-                    for stock in candidates:
-                        symbol, token, df = stock["symbol"], stock["token"], stock["daily_df"]
-                        avg_vol_10d = stock["avg_vol_10d"]
+                # FIX (તમારી feedback પ્રમાણે): candidates loop હવે nifty_ok ના
+                # gate ની બહાર છે. એટલે score 80+ ધરાવતા દરેક શોર્ટલિસ્ટેડ
+                # સ્ટોકનું diagnostic message + rejection-logging Nifty
+                # positive હોય કે negative — બંને case માં થશે. Nifty ને
+                # ફક્ત નીચે "actual BUY signal મોકલવો કે નહીં" ના નિર્ણય
+                # માટે જ વાપર્યો છે (વધુ નીચે જુઓ).
+                active_symbols = {t["symbol"] for t in active_trades}
+                candidates = [s for s in shortlist if s["symbol"] not in active_symbols]
+                cand_tokens = [c["token"] for c in candidates]
+                quotes = get_market_quotes_batch(smart_api, cand_tokens)
 
-                        df_today = get_today_intraday_cached(smart_api, token, intraday_cache, now)
-                        if df_today is None or df_today.empty:
-                            continue
+                # FIX #1: multiple trades allowed હોવાથી, જે પણ સ્ટોક
+                # filters pass કરે એ DEરેકને signal મોકલવો — ફક્ત
+                # single top-score ને નહીં (પહેલાં આ bug હતું).
+                for stock in candidates:
+                    symbol, token, df = stock["symbol"], stock["token"], stock["daily_df"]
+                    avg_vol_10d = stock["avg_vol_10d"]
 
-                        prev_close = get_previous_close(df, now.date())
-                        if prev_close is None:
-                            continue
+                    df_today = get_today_intraday_cached(smart_api, token, intraday_cache, now)
+                    if df_today is None or df_today.empty:
+                        continue
 
-                        sector_name = stock.get("sector")
-                        sector_token = sector_indices.get(sector_name) if sector_name else None
-                        sector_positive = is_index_positive(smart_api, sector_token, intraday_cache, now) \
-                            if sector_token else True
+                    prev_close = get_previous_close(df, now.date())
+                    if prev_close is None:
+                        continue
 
-                        quote = quotes.get(token)
-                        ok, reason, metrics = deep_filters_pass(df, df_today, prev_close, quote, now,
-                                                                 avg_vol_10d, sector_positive)
+                    sector_name = stock.get("sector")
+                    sector_token = sector_indices.get(sector_name) if sector_name else None
+                    sector_positive = is_index_positive(smart_api, sector_token, intraday_cache, now) \
+                        if sector_token else True
 
-                        # NEW: સ્ટોક પહેલીવાર ચેક થાય ત્યારે diagnostic message (એક જ વાર/દિવસ)
-                        if symbol not in diag_sent:
-                            diag_sent.add(symbol)
-                            send_telegram_msg(format_diag_message(symbol, metrics))
+                    quote = quotes.get(token)
+                    ok, reason, metrics = deep_filters_pass(df, df_today, prev_close, quote, now,
+                                                             avg_vol_10d, sector_positive)
 
-                        if not ok:
-                            rejection_reasons[symbol] = reason   # NEW: reject reason log (latest)
-                            continue
+                    # NEW: સ્ટોક પહેલીવાર ચેક થાય ત્યારે diagnostic message (એક જ વાર/દિવસ) —
+                    # Nifty/Sector negative હોય કે VWAP/Buyer fail થાય તો પણ મોકલાય છે.
+                    if symbol not in diag_sent:
+                        diag_sent.add(symbol)
+                        send_telegram_msg(format_diag_message(
+                            symbol, stock["score"], metrics,
+                            nifty_ok=nifty_ok, sector_positive=sector_positive,
+                            has_event=stock.get("has_event", False),
+                        ))
 
-                        rejection_reasons.pop(symbol, None)      # entry લેવાય તો reject log માંથી કાઢી નાખો
+                    if not ok:
+                        rejection_reasons[symbol] = reason   # NEW: reject reason log (latest)
+                        continue
 
-                        ltp = quote["ltp"] if quote and quote.get("ltp") else df_today["close"].iloc[-1]
-                        sl = round(ltp * (1 - INITIAL_SL_PCT / 100), 2)
-                        target = round(ltp * (1 + TARGET_PCT / 100), 2)
+                    if not nifty_ok:
+                        # સ્ટોકની બધી condition pass છે, પણ Market Trend negative
+                        # હોવાથી હમણાં Entry નથી લેવાતી. Reject log માં ના નાખો —
+                        # આ સ્ટોક હજુ candidate જ છે, આગલા scan cycle માં Nifty
+                        # positive થાય તો entry લેવાઈ શકે.
+                        rejection_reasons.pop(symbol, None)
+                        continue
 
-                        msg = (
-                            f"🔥 *INTRADAY BUY SIGNAL* 🔥\n\n"
-                            f"📌 *Stock:* {symbol}\n"
-                            f"💰 *Entry:* ₹{ltp}\n"
-                            f"🎯 *Target ({TARGET_PCT}%):* ₹{target}\n"
-                            f"🛑 *SL ({INITIAL_SL_PCT}%):* ₹{sl}\n"
-                            f"📊 *Score:* {stock['score']}/{MAX_POSSIBLE_SCORE}\n"
+                    rejection_reasons.pop(symbol, None)      # entry લેવાય તો reject log માંથી કાઢી નાખો
+
+                    ltp = quote["ltp"] if quote and quote.get("ltp") else df_today["close"].iloc[-1]
+                    sl = round(ltp * (1 - INITIAL_SL_PCT / 100), 2)
+                    target = round(ltp * (1 + TARGET_PCT / 100), 2)
+
+                    msg = (
+                        f"🔥 *INTRADAY BUY SIGNAL* 🔥\n\n"
+                        f"📌 *Stock:* {symbol}\n"
+                        f"💰 *Entry:* ₹{ltp}\n"
+                        f"🎯 *Target ({TARGET_PCT}%):* ₹{target}\n"
+                        f"🛑 *SL ({INITIAL_SL_PCT}%):* ₹{sl}\n"
+                        f"📊 *Score:* {stock['score']}/{MAX_POSSIBLE_SCORE}\n"
+                    )
+                    if stock.get("has_event"):
+                        msg += (
+                            "\n⚠️ *સિલેક્શન કન્ડિશન બની છે, પણ આજે સ્ટોકમાં EVENT "
+                            "(Result/Dividend) છે. ધ્યાનપૂર્વક ટ્રેડ કરવો.*\n"
                         )
-                        if stock.get("has_event"):
-                            msg += (
-                                "\n⚠️ *સિલેક્શન કન્ડિશન બની છે, પણ આજે સ્ટોકમાં EVENT "
-                                "(Result/Dividend) છે. ધ્યાનપૂર્વક ટ્રેડ કરવો.*\n"
-                            )
-                        if not sector_positive:
-                            msg += (
-                                "\nℹ️ *Nifty પોઝિટિવ છે એટલે Opportunity છે, પરંતુ સેક્ટર "
-                                "નેગેટિવ છે. રિસ્ક મેનેજમેન્ટ સાથે આગળ વધવું.*\n"
-                            )
-                        send_telegram_msg(msg)
+                    if not sector_positive:
+                        msg += (
+                            "\nℹ️ *Nifty પોઝિટિવ છે એટલે Opportunity છે, પરંતુ સેક્ટર "
+                            "નેગેટિવ છે. રિસ્ક મેનેજમેન્ટ સાથે આગળ વધવું.*\n"
+                        )
+                    send_telegram_msg(msg)
 
-                        active_trades.append({
-                            "symbol": symbol, "token": token,
-                            "entry": ltp, "sl": sl, "target": target,
-                            "be_alert_sent": False, "downside_alert_sent": False,
-                            "eod_alert_sent": False,
-                        })
+                    active_trades.append({
+                        "symbol": symbol, "token": token,
+                        "entry": ltp, "sl": sl, "target": target,
+                        "be_alert_sent": False, "downside_alert_sent": False,
+                        "eod_alert_sent": False,
+                    })
 
             consecutive_errors = 0
             time.sleep(TICK_SEC)
